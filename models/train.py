@@ -1,49 +1,63 @@
+import os
+import glob
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torch.utils.data import DataLoader, TensorDataset
 import numpy as np
-from baseline_tcn import BaselineTCN
+
+try:
+    from models.baseline_tcn import BaselineTCN
+except ImportError:
+    from baseline_tcn import BaselineTCN
+
+def load_batch_dataset(data_dir="data/processed/v2.2_space_weather_telemetry"):
+    batch_files = sorted(glob.glob(os.path.join(data_dir, "batch_*.npz")))
+    if not batch_files:
+        raise FileNotFoundError(f"No batch files found in {data_dir}. Run generate_dataset.py first!")
+
+    X_list, y_list = [], []
+    for file in batch_files:
+        data = np.load(file)
+        X_list.append(data['X'])
+        y_list.append(data['y'])
+
+    X_all = np.concatenate(X_list, axis=0)
+    y_all = np.concatenate(y_list, axis=0)
+
+    print(f"Loaded {X_all.shape[0]} total signals from {len(batch_files)} batches.")
+    return torch.tensor(X_all, dtype=torch.float32), torch.tensor(y_all, dtype=torch.float32)
 
 def train_model():
-    # Check if Apple Silicon GPU (MPS) acceleration is available on your Mac Mini M4
-    device = torch.device("mps" if torch.backends.mps.is_available() else "cpu")
-    print(f"🚀 Training on device: {device}")
-    
-    # Load dataset generated from your simulation
-    X_train = np.load("data/processed/X_train.npy")
-    y_train = np.load("data/processed/y_train.npy")
-    X_val = np.load("data/processed/X_val.npy")
-    y_val = np.load("data/processed/y_val.npy")
-    
-    # Convert to PyTorch tensors and create data loaders
-    train_dataset = torch.utils.data.TensorDataset(torch.tensor(X_train), torch.tensor(y_train))
-    train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=32, shuffle=True)
-    
-    model = BaselineTCN().to(device)
-    criterion = nn.MSELoss() # Mean Squared Error for phase tracking accuracy
+    X, y = load_batch_dataset()
+
+    dataset = TensorDataset(X, y)
+    dataloader = DataLoader(dataset, batch_size=64, shuffle=True)
+
+    model = BaselineTCN(input_channel=3, output_channel=3)
+    criterion = nn.MSELoss()
     optimizer = optim.Adam(model.parameters(), lr=0.001)
-    
-    print("🧠 Training neural network on simulated ionospheric data...")
-    epochs = 10
+
+    epochs = 15
+    print("Starting Multi-Task training (Signal Recovery + Cycle Slip + S4 Telemetry)...")
+
+    model.train()
     for epoch in range(epochs):
-        model.train()
-        total_loss = 0
-        for batch_x, batch_y in train_loader:
-            batch_x, batch_y = batch_x.to(device), batch_y.to(device)
-            
+        epoch_loss = 0.0
+        for batch_X, batch_y in dataloader:
             optimizer.zero_grad()
-            predictions = model(batch_x)
-            loss = criterion(predictions, batch_y)
+            outputs = model(batch_X)
+            loss = criterion(outputs, batch_y)
             loss.backward()
             optimizer.step()
-            
-            total_loss += loss.item()
-            
-        print(f"Epoch [{epoch+1}/{epochs}], Loss: {total_loss / len(train_loader):.6f}")
-        
-    # Save the trained baseline model weights
+            epoch_loss += loss.item() * batch_X.size(0)
+
+        total_loss = epoch_loss / len(dataset)
+        print(f"Epoch [{epoch+1}/{epochs}], Multi-Task Loss (MSE): {total_loss:.6f}")
+
+    os.makedirs("models", exist_ok=True)
     torch.save(model.state_dict(), "models/baseline_tcn.pth")
-    print("✅ Model training complete and saved to `models/baseline_tcn.pth`!")
+    print("Trained model weights saved to models/baseline_tcn.pth!")
 
 if __name__ == "__main__":
     train_model()

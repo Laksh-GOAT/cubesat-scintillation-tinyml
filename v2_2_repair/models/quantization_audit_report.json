@@ -1,0 +1,86 @@
+{
+  "folding_equivalence": {
+    "max_abs_diff_fp32_vs_folded": 2.288818359375e-05,
+    "mean_abs_diff_fp32_vs_folded": 5.207014623920259e-07,
+    "max_abs_diff_fp32_vs_w8a32": 0.7311496734619141,
+    "mean_abs_diff_fp32_vs_w8a32": 0.03483640402555466
+  },
+  "storage_bytes": {
+    "original_fp32_pth_file_bytes": 77353,
+    "raw_unfolded_fp32_param_and_buffer_bytes": 64652,
+    "exported_quantized_pth_file_bytes": 120038557,
+    "raw_binary_file_bytes": 16776,
+    "raw_int8_weight_bytes": 15528,
+    "raw_fp32_bias_bytes": 620,
+    "raw_fp32_scale_bytes": 620,
+    "total_flash_constant_bytes": 16768,
+    "runtime_working_sram_L1000_bytes": 524000,
+    "runtime_working_sram_L128_bytes": 67072
+  },
+  "held_out_test_metrics": {
+    "slip_threshold_used": 0.82,
+    "unfolded_fp32": {
+      "task1_envelope": {
+        "MSE": 0.01608550176024437,
+        "MAE": 0.10177382826805115
+      },
+      "task2_cycle_slip": {
+        "TP": 87322,
+        "FP": 72,
+        "TN": 4912528,
+        "FN": 78,
+        "precision": 0.9991761448153192,
+        "recall": 0.9991075514872999,
+        "f1": 0.9991418419740382
+      },
+      "task3_s4": {
+        "MAE": 0.021810485050082207,
+        "RMSE": 0.0290119219571352,
+        "severe_S4_ge_0.6_MAE": 0.02634930983185768,
+        "severe_S4_ge_0.6_RMSE": 0.03426279127597809
+      }
+    },
+    "quantized_w8a32": {
+      "task1_envelope": {
+        "MSE": 0.016109852120280266,
+        "MAE": 0.10180196166038513
+      },
+      "task2_cycle_slip": {
+        "TP": 87323,
+        "FP": 75,
+        "TN": 4912525,
+        "FN": 77,
+        "precision": 0.9991418567929473,
+        "recall": 0.9991189931348972,
+        "f1": 0.9991304198331219
+      },
+      "task3_s4": {
+        "MAE": 0.022014638409018517,
+        "RMSE": 0.02927570603787899,
+        "severe_S4_ge_0.6_MAE": 0.026466412469744682,
+        "severe_S4_ge_0.6_RMSE": 0.03454725816845894
+      }
+    },
+    "quantized_w8a8": {
+      "task1_envelope": {
+        "MSE": 0.01632602885365486,
+        "MAE": 0.10244914889335632
+      },
+      "task2_cycle_slip": {
+        "TP": 87324,
+        "FP": 73,
+        "TN": 4912527,
+        "FN": 76,
+        "precision": 0.9991647310547274,
+        "recall": 0.9991304347824944,
+        "f1": 0.9991475776243014
+      },
+      "task3_s4": {
+        "MAE": 0.023669499903917313,
+        "RMSE": 0.031060880050063133,
+        "severe_S4_ge_0.6_MAE": 0.028090864419937134,
+        "severe_S4_ge_0.6_RMSE": 0.03632185980677605
+      }
+    }
+  }
+}

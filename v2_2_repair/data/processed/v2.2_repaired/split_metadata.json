@@ -1,0 +1,32 @@
+{
+  "splits": {
+    "train": {
+      "num_samples": 40000,
+      "base_seed": 100000,
+      "s4_min": 0.0801210030913353,
+      "s4_max": 1.038496494293213,
+      "s4_mean": 0.5636033563632518,
+      "s4_std": 0.2546842631297647,
+      "signals_with_cycle_slips": 27983
+    },
+    "val": {
+      "num_samples": 5000,
+      "base_seed": 500000,
+      "s4_min": 0.08005265891551971,
+      "s4_max": 1.011911392211914,
+      "s4_mean": 0.560459164480865,
+      "s4_std": 0.253422114664466,
+      "signals_with_cycle_slips": 3501
+    },
+    "test": {
+      "num_samples": 5000,
+      "base_seed": 900000,
+      "s4_min": 0.08047981560230255,
+      "s4_max": 1.0201363563537598,
+      "s4_mean": 0.5648016111701727,
+      "s4_std": 0.2558558237461686,
+      "signals_with_cycle_slips": 3487
+    }
+  },
+  "regeneration_command": "python v2_2_repair/data_gen/generate_dataset.py"
+}
